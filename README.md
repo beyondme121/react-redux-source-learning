@@ -1,70 +1,114 @@
-# Getting Started with Create React App
+## createStore
+```js
+import ActionTypes from './utils/action-types'
+function createStore (reducer, preloadState) {
+    let currentState = preloadState
+    let listeners = []
+    function getState () {
+        return currentState
+    }
+    function dispatch (action) {
+        currentState = reducer(currentState, action)
+        listeners.forEach(l => l())
+        return action
+    }
+    function subscribe (listener) {
+        listeners.push(listener)
+        return function () {
+            listeners = listeners.filter(l => l != listener)
+            return listeners
+        }
+    }
+    console.log(ActionTypes.INIT)
+    dispatch({type: ActionTypes.INIT})
+    return {
+        getState,
+        dispatch,
+        subscribe
+    }
+}
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+export default createStore
+```
 
-## Available Scripts
+## store.subscribe的返回结果是取消订阅的函数
+- componentDidMount 订阅可以改变组件状态的函数 store中的状态改变了 调用了setState就会重新刷新组件
+- componentWillUnmount: 将监听函数移除 后续代码验证 通过渲染另外的DOM 卸载Counter1 达到目的
+```js
+import React, { Component } from 'react'
+import { createStore } from '../redux'
 
-In the project directory, you can run:
+let initState = { count: 100 }
+const counterReducer = (state = initState, action) => {
+    switch (action.type) {
+        case 'ADD':
+            return {
+                count: state.count + 1
+            }
+        case 'MINUS':
+            return {
+                count: state.count - 1
+            }
+        default:
+            return state;
+    }
+}
+let store = createStore(counterReducer, initState)
 
-### `npm start`
+export default class Counter1 extends Component {
+    state = {
+        number: 0
+    }
+    componentDidMount () {
+        // 组件挂载完成后, 获取store中的状态并更新组建的状态 从而重新渲染组件(this.setState)
+        this.unsubscribe = store.subscribe(() => this.setState({ number: store.getState().count }))
+    }
+    componentWillUnmount () {
+        console.log("componentWillUnmount")
+        this.unsubscribe()
+    }
+    render() {
+        return (
+            <div>
+                <p>{this.state.number}</p>
+                <button onClick={() => store.dispatch({type: 'ADD'})}>+</button>
+                <button onClick={() => store.dispatch({type: 'MINUS'})}>-</button>
+                <button onClick={() => setTimeout(() => {
+                    store.dispatch({type: 'ADD'})
+                }, 1000)}>延迟1s加1</button>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+            </div>
+        )
+    }
+}
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```
 
-### `npm test`
+- 组件卸载
+```js
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import Counter1 from "./components/Counter1";
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+function App() {
+  let [number, setNumber] = useState(() => Math.random());
 
-### `npm run build`
+  let handleClick = () => {
+    setNumber(Math.random());
+  };
+  let element;
+  if (number > 0.5) {
+    element = <Counter1 />;
+  } else {
+    element = <div>DOM Element</div>;
+  }
+  return (
+    <div>
+      <button onClick={handleClick}>get Number</button>
+      {element}
+    </div>
+  );
+}
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+ReactDOM.render(<App />, document.getElementById("root"));
+```
