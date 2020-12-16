@@ -115,3 +115,38 @@ ReactDOM.render(<App />, document.getElementById("root"));
 
 
 ## ActionCreators的由来
+组件中修改store中的状态,需要调用store.dispatch方法, 传递一个action对象, {type: 'xxx'}, 不太优雅, 
+我希望, 
+- 将action对象通过函数的方式进行返回, 然后调用函数的方式获取这个对象
+- 将store中的dispatch方法 与 actionCreator的返回结果进行整合, 形成一个函数, 外部进行调用
+
+```js
+function bindActionCreator(action, dispatch) {
+  //返回值是个派发函数
+  return (...args) => {
+    if (typeof action === 'function') {
+      return dispatch(action(...args))
+    } else {
+      return dispatch(action)
+    }
+  }
+}
+
+function bindActionCreators(actions, dispatch) {
+  if (typeof actions === 'function') {
+    return bindActionCreator(actions, dispatch)
+  }
+  let combineActionCreators = {}
+  for (let key in actions) {
+    combineActionCreators[key] = bindActionCreator(actions[key], dispatch)
+  }
+  return combineActionCreators
+}
+
+export default bindActionCreators
+```
+
+
+## combineReducer
+统一合并reducer, 合并拆分的reducer
+
