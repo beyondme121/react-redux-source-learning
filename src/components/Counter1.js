@@ -1,37 +1,10 @@
 import React, { Component } from 'react'
-import { createStore, bindActionCreators } from '../redux'
+import { bindActionCreators } from '../redux'
+import store from '../store'
+import counter1Actions from '../store/actions/counter1'
 
-let initState = { count: 100 }
-const counterReducer = (state = initState, action) => {
-  switch (action.type) {
-    case 'ADD':
-      return {
-        count: state.count + 1,
-      }
-    case 'MINUS':
-      return {
-        count: state.count - 1,
-      }
-    default:
-      return state
-  }
-}
-let store = createStore(counterReducer, initState)
-
-// actionCreators
-function add() {
-  return {
-    type: 'ADD',
-  }
-}
-function minus() {
-  return {
-    type: 'MINUS',
-  }
-}
-const actions = { add, minus }
 // 绑定了所有actionCreator(函数)组成的对象{fn1, fn2,...}, 并将dispatch传递进去 返回新的对象
-let bindActions = bindActionCreators(actions, store.dispatch)
+let bindActions = bindActionCreators(counter1Actions, store.dispatch)
 
 export default class Counter1 extends Component {
   state = {
@@ -40,7 +13,7 @@ export default class Counter1 extends Component {
   componentDidMount() {
     // 组件挂载完成后, 获取store中的状态并更新组建的状态 从而重新渲染组件(this.setState)
     this.unsubscribe = store.subscribe(() =>
-      this.setState({ number: store.getState().count })
+      this.setState({ number: store.getState().counter1.number })
     )
   }
   componentWillUnmount() {
@@ -64,12 +37,26 @@ export default class Counter1 extends Component {
           延迟1s加1
         </button>
         <section>使用 bindActionCreators 对actionCreator进行包装</section>
-        <button onClick={bindActions.add}>+</button>
-        <button onClick={bindActions.minus}>-</button>
+        <button onClick={bindActions.add1}>+</button>
+        <button onClick={bindActions.minus1}>-</button>
         <button
           onClick={() =>
             setTimeout(() => {
-              bindActions.add()
+              bindActions.add1()
+            }, 1000)
+          }
+        >
+          延迟1s加1
+        </button>
+
+        <section>使用 combineReducer </section>
+        <p>{this.state.number}</p>
+        <button onClick={() => bindActions.add1(20)}>+</button>
+        <button onClick={() => bindActions.minus1(3)}>-</button>
+        <button
+          onClick={() =>
+            setTimeout(() => {
+              bindActions.add(999)
             }, 1000)
           }
         >

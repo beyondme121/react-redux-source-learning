@@ -148,5 +148,42 @@ export default bindActionCreators
 
 
 ## combineReducer
-统一合并reducer, 合并拆分的reducer
+统一合并reducer, 合并拆分的reducer, 
+- 用法 store/reducers/index.js 或者是store/index.js中combine 推荐第一种
+```js
+import { combineReducers } from 'redux'
+let rootReducers = combineReducers({
+  reducer1,
+  reducer2,
+  //...
+})
+export default rootReducers
+```
+
+- store中引用这个rootReducer
+```js
+import { createStore } from 'redux'
+import rootReducer from './reducer'
+let store = createStore(rootReducer)
+```  
+
+- 组件使用
+```js
+// 1. 
+store.getState().counter1.number
+```
+
+- combineReducer接收对象, 返回一个reducer函数, 供createStore调用传递参数, reducer执行返回状态数据 -> 前置知识点
+```js
+function combineReducers (reducers) {
+  return function combination (state = {}, action) {
+    let nextState = {}
+    for (let key in reducers) {
+      nextState[key] = reducers[key](state[key], action)
+    }
+    return nextState
+  }
+}
+```
+
 
