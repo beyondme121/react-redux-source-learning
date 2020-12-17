@@ -1,7 +1,7 @@
 import * as types from '../action-types'
 
 let initState = { number: 10 }
-export default function (state = initState, action) {
+export default function counter1(state = initState, action) {
   switch (action.type) {
     case types.ADD1:
       return {

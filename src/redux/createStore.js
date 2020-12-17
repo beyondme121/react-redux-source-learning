@@ -13,7 +13,7 @@ function createStore (reducer, preloadState) {
     function subscribe (listener) {
         listeners.push(listener)
         return function () {
-            listeners = listeners.filter(l => l != listener)
+            listeners = listeners.filter(l => l !== listener)
             return listeners
         }
     }

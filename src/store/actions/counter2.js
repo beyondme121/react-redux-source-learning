@@ -1,20 +1,20 @@
 // actionCreator
 import * as types from '../action-types'
 
-function add1(num) {
+function add2(num) {
   return {
-    type: types.ADD1,
+    type: types.ADD2,
     payload: num,
   }
 }
-function minus1(num) {
+function minus2(num) {
   return {
-    type: types.MINUS1,
+    type: types.MINUS2,
     payload: num,
   }
 }
 let actions = {
-  add1,
-  minus1
+  add2,
+  minus2
 }
 export default actions

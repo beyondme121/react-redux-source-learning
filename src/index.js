@@ -22,7 +22,7 @@ function App() {
       <button onClick={handleClick}>get Number</button>
       {element}
       <p>react-redux</p>
-      <Counter2 />
+      <Counter2 paramsAge={99}/>
     </div>
   )
 }
