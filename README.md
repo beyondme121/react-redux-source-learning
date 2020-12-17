@@ -187,3 +187,11 @@ function combineReducers (reducers) {
 ```
 
 
+## react-redux
+为了改善组件中使用store对象, 以及还要进行bindActionCreator, 让组件使用store更加方便
+- store中的state映射到组件中的props
+- store中的action映射到props
+
+- 通过Provider组件, 上下文对象, 传递store这个仓库对象
+- connect函数, 将store中的state和action映射到props
+
