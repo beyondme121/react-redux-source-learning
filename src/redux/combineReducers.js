@@ -7,10 +7,10 @@
 function combineReducers(rootReducer) {
   return (state = {}, action) => {
     let nextState = {}
-    console.log('rootReducer:', rootReducer)
+    // console.log('rootReducer:', rootReducer)
     // debugger
     for (let key in rootReducer) {
-      console.log('key, ', key)
+      // console.log('key, ', key)
       nextState[key] = rootReducer[key](state[key], action)
     }
     return nextState
