@@ -195,3 +195,89 @@ function combineReducers (reducers) {
 - 通过Provider组件, 上下文对象, 传递store这个仓库对象
 - connect函数, 将store中的state和action映射到props
 
+
+## redux中间件
+- 重写dispatch方法，AOP, 前后加逻辑. 加异步方法 promise, ajax请求等
+```js
+// 实现日志中间件
+let store = createStore(reducer, {
+  counter1: { number: 0 },
+  counter2: { number: 100}
+})
+// 保存store中的原始dispatch方法 (接收action对象, dispatch函数内部调用reducer, 
+// reducer参数为state, 改变完状态, 让所有的监听函数执行)
+let dispatch = store.dispatch
+store.dispatch = function (action) {
+  console.log('----------->')
+  // 调用原始的store.dispatch方法, 传入action
+  dispatch(action)
+  console.log('<-----------')
+  return action
+}
+```
+
+## 实现异步action
+```js
+// 异步action
+store.dispatch = function (action) {
+  setTimeout(() => {
+    dispatch(action)
+  }, 1000)
+  return action
+}
+```
+
+## 单个中间件
+
+
+## redux中间件原理
+> https://www.cnblogs.com/rock-roll/p/10763383.html
+> https://www.jianshu.com/p/ae7b5a2f78ae
+
+
+## redux中间件原理
+```js
+// 返回store对象
+function applyMiddleware(middleware) {
+  return function (createStore) {
+    return function (reducer) {
+      let store = createStore(reducer)
+      let dispatch = middleware(store)
+      return {
+        ...store,
+        dispatch  // 返回修改后的dispatch函数, 经过加工的dispatch函数
+      }
+    }
+  }
+}
+// redux中间件的写法应用
+// 中间件接收的肯定是store, 信息越多越好, 只接收dispatch方法是不全的
+function logger (store) {
+  let { getState, dispatch } = store
+  let newDispatch = (action) => {
+    console.log("logger prev", getState())
+    dispatch(action)
+    console.log("logger after", getState())
+  }
+  return newDispatch
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

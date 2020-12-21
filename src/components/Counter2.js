@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react'
 import { connect } from '../react-redux'
-import actions from '../store/actions/counter2'
+// import actions from '../store/actions/counter2'
 import * as actionTypes from '../store/action-types'
 class Counter2 extends Component {
   render() {
