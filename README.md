@@ -265,7 +265,63 @@ function logger (store) {
 ```
 
 
+## 原生redux中的action只能是对象
+由于希望更多的业务逻辑和异步处理, 就有了中间件, dispatch可以是个函数thunk,也可以是个promise,
 
+### redux-thunk
+```js
+function thunk ({getState, dispatch}) {
+  return function (next) {
+    return function (action) {
+      if (typeof action === 'function') {
+        action(getState, dispatch)
+      }
+      next(action)  // 此处的action就是默认的对象类型 {type: 'xxx',payload: xxx}
+    }
+  }
+}
+```
+
+### redux-promise
+
+```js
+const promise = api => next => action => {
+  if (typeof action.then === 'function') {
+    // 重新派发
+    action.then(newAction => api.dispatch(newAction))
+  }
+  next(action)
+}
+
+```
+
+### 中间件调用使用
+
+```js
+import * as types from '../action-types'
+
+let actions = {
+    add1() {
+        return {type: types.ADD1}
+    },
+    thunkAdd1 (payload) {
+        return (dispatch, getState) => {
+            setTimeout(() => {
+                dispatch({type: types.ADD1, payload: payload})
+            }, 1000)
+        }
+    },
+    promiseAdd1 (amount) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({type: types.ADD1, payload: amount})
+            }, 1000);
+        })
+    }
+}
+
+export default actions
+```
 
 
 

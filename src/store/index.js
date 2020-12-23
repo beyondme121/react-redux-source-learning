@@ -2,6 +2,9 @@
 
 import { createStore, applyMiddleware } from '../redux'
 import reducers from './reducers'
+import logger from '../middlewares/logger'
+import promise from '../middlewares/promise'
+import thunk from '../middlewares/thunk'
 
 // let store = createStore(reducers)
 // window.store = store
@@ -30,7 +33,7 @@ import reducers from './reducers'
 // redux中的应用中间件的函数
 
 // 函数调用
-let store = applyMiddleware(logger)(createStore)(reducers)
+let store = applyMiddleware(logger, thunk, promise)(createStore)(reducers)
 
 // 最终返回store
 // function applyMiddleware(logger) {
@@ -46,16 +49,16 @@ let store = applyMiddleware(logger)(createStore)(reducers)
 // }
 
 // 中间件标准规范
-function logger(store) {
-  return function (next) {
-    // 老的dispatch
-    return function (action) {
-      console.log('preState ', store.getState())
-      next(action)
-      console.log('nextState ', store.getState())
-    }
-  }
-}
+// function logger(store) {
+//   return function (next) {
+//     // 老的dispatch
+//     return function (action) {
+//       console.log('preState ', store.getState())
+//       next(action)
+//       console.log('nextState ', store.getState())
+//     }
+//   }
+// }
 
 // function compose(...funcs) {
 //   return funcs.reduce((a, b) => (...args) => a(b(...args)))
